@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/ban-types */
+
 export const BULLETCLASS = '__bullet-item-style'
 export const BULLETTEMPCLASS = '__bullet-temp-container'
 
@@ -6,34 +8,35 @@ export const BULLETTEMPCLASS = '__bullet-temp-container'
  * @param {*} width
  */
 export const initBulletAnimate = (width: number): void => {
-  let style = document.createElement('style')
+  const style = document.createElement('style')
   const animateClass = 'BULLET_ANIMATE'
   style.classList.add(animateClass)
 
-  let from = `from { visibility: visible; transform: translateX(${width}px); }`
-  let to = `to { visibility: visible; transform: translateX(-100%); }`
+  const from = 'from { transform: translateX(-100%); }'
+  const to = `to { transform: translateX(${width}px); }`
 
-  const animateString = `@keyframes RightToLeft { ${from} ${to} }`
+  const animateString = `@keyframes LeftToRight { ${from} ${to} }`
 
   const bulletContainer = `
   .${BULLETCLASS} {
-		cursor: pointer;
-		position: absolute;
-		left: 0;
-		animation-name: RightToLeft;
-		animation-timing-function: linear;
-		overflow: hidden;
-		display: inline-block;
-		word-break: keep-all;
-		white-space: nowrap;
-	}`
+    cursor: pointer;
+    position: absolute;
+    left: 0;
+    animation-name: LeftToRight;
+    animation-timing-function: linear;
+    overflow: hidden;
+    display: inline-block;
+    word-break: keep-all;
+    white-space: nowrap;
+    visibility: visible;
+  }`
 
   const bulletTempContainer = `
-	.${BULLETTEMPCLASS} {
-		position: absolute;
-		right: 9999px;
-		visibility: hidden;
-	}`
+  .${BULLETTEMPCLASS} {
+    position: absolute;
+    left: -9999px;
+    visibility: hidden;
+  }`
 
   style.innerHTML = animateString + bulletContainer + bulletTempContainer
   document.head.appendChild(style)
@@ -44,13 +47,13 @@ export const initBulletAnimate = (width: number): void => {
  * @param {*} opts
  */
 
-export type ItrackObj = {
+export interface ItrackObj {
   speed: number
   // 后续可能还会增加其他属性，先以对象表示
 }
 
 export interface IoptsType {
-  trackHeight?: number
+  trackHeight: number
   trackArr?: ItrackObj[]
   pauseOnHover?: boolean
   pauseOnClick?: boolean
@@ -74,7 +77,7 @@ export const getContainer = (): HTMLElement => {
  * @param {*} max
  */
 export const getRandom = (min: number, max: number): number =>
-  parseInt((Math.random() * (max - min + 1)) as any) + min
+  Number.parseInt((Math.random() * (max - min + 1)) as any) + min
 
 /**
  * 事件委托
@@ -88,24 +91,25 @@ export function eventEntrust(
   className: string,
   cb: (el: HTMLElement) => void,
 ) {
-  target.addEventListener(event, e => {
+  target.addEventListener(event, (e) => {
     let el = e.target as HTMLElement
 
     // 判断当前点击的元素是否为指定的classname，如果不是，执行以下的while循环
     while (!el.className.includes(className)) {
       // 如果点击的元素为target，直接跳出循环（代表未找到目标元素）
       if (el === target) {
-        el = null
+        el = null as unknown as HTMLElement
         break
       }
-      //否则，将当前元素父元素赋给el
+      // 否则，将当前元素父元素赋给el
       // console.log('whild循环中...')
       el = el.parentNode as HTMLElement
     }
     if (el) {
       // console.log('找到目标元素')
       cb(el)
-    } else {
+    }
+    else {
       // console.log('你触发的不是目标元素')
     }
   })
